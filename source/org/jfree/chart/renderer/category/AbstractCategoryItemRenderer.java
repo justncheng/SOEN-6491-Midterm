@@ -969,14 +969,10 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
             if (!range.contains(value)) {
                 return;
             }
-
-            final Composite originalComposite = g2.getComposite();
-            g2.setComposite(AlphaComposite.getInstance(
-                    AlphaComposite.SRC_OVER, marker.getAlpha()));
-
-            PlotOrientation orientation = plot.getOrientation();
+            
             double v = axis.valueToJava2D(value, dataArea,
                     plot.getRangeAxisEdge());
+            PlotOrientation orientation = plot.getOrientation();
             Line2D line = null;
             if (orientation == PlotOrientation.HORIZONTAL) {
                 line = new Line2D.Double(v, dataArea.getMinY(), v,
@@ -986,7 +982,9 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
                 line = new Line2D.Double(dataArea.getMinX(), v,
                         dataArea.getMaxX(), v);
             }
-
+            final Composite originalComposite = g2.getComposite();
+            g2.setComposite(AlphaComposite.getInstance(
+                    AlphaComposite.SRC_OVER, marker.getAlpha()));
             g2.setPaint(marker.getPaint());
             g2.setStroke(marker.getStroke());
             g2.draw(line);
@@ -996,6 +994,7 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
             if (label != null) {
                 Font labelFont = marker.getLabelFont();
                 g2.setFont(labelFont);
+                g2.setPaint(marker.getLabelPaint());
 				Rectangle2D markerArea = line.getBounds2D();
 				RectangleInsets markerOffset = marker.getLabelOffset();
 				LengthAdjustmentType labelOffsetType = LengthAdjustmentType.EXPAND;
@@ -1009,7 +1008,6 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
 				            LengthAdjustmentType.CONTRACT, labelOffsetType);
 				}
                 Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
-                g2.setPaint(marker.getLabelPaint());
                 TextUtilities.drawAlignedString(label, g2, 
                         (float) coordinates.getX(), (float) coordinates.getY(),
                         marker.getLabelTextAnchor());
@@ -1024,10 +1022,6 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
             if (!(range.intersects(start, end))) {
                 return;
             }
-
-            final Composite originalComposite = g2.getComposite();
-            g2.setComposite(AlphaComposite.getInstance(
-                    AlphaComposite.SRC_OVER, marker.getAlpha()));
 
             double start2d = axis.valueToJava2D(start, dataArea,
                     plot.getRangeAxisEdge());
@@ -1054,6 +1048,10 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
                         low, dataArea.getWidth(),
                         high - low);
             }
+            
+            final Composite originalComposite = g2.getComposite();
+            g2.setComposite(AlphaComposite.getInstance(
+                     AlphaComposite.SRC_OVER, marker.getAlpha()));
             Paint p = marker.getPaint();
             if (p instanceof GradientPaint) {
                 GradientPaint gp = (GradientPaint) p;
