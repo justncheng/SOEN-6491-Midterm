@@ -970,7 +970,7 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
                 return;
             }
 
-            final Composite savedComposite = g2.getComposite();
+            final Composite originalComposite = g2.getComposite();
             g2.setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER, marker.getAlpha()));
 
@@ -1014,7 +1014,7 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
                         (float) coordinates.getX(), (float) coordinates.getY(),
                         marker.getLabelTextAnchor());
             }
-            g2.setComposite(savedComposite);
+            g2.setComposite(originalComposite);
         }
         else if (marker instanceof IntervalMarker) {
             IntervalMarker im = (IntervalMarker) marker;
@@ -1025,7 +1025,7 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
                 return;
             }
 
-            final Composite savedComposite = g2.getComposite();
+            final Composite originalComposite = g2.getComposite();
             g2.setComposite(AlphaComposite.getInstance(
                     AlphaComposite.SRC_OVER, marker.getAlpha()));
 
@@ -1124,7 +1124,7 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
                         (float) coordinates.getX(), (float) coordinates.getY(),
                         marker.getLabelTextAnchor());
             }
-            g2.setComposite(savedComposite);
+            g2.setComposite(originalComposite);
         }
     }
 

@@ -1296,23 +1296,23 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
      *
      * @param g2  the graphics device.
      * @param plot  the plot.
-     * @param rangeAxis  the range axis.
+     * @param axis  the range axis.
      * @param marker  the marker line.
      * @param dataArea  the axis data area.
      */
     @Override
-    public void drawRangeMarker(Graphics2D g2, XYPlot plot, ValueAxis rangeAxis,
+    public void drawRangeMarker(Graphics2D g2, XYPlot plot, ValueAxis axis,
             Marker marker, Rectangle2D dataArea) {
 
         if (marker instanceof ValueMarker) {
             ValueMarker vm = (ValueMarker) marker;
             double value = vm.getValue();
-            Range range = rangeAxis.getRange();
+            Range range = axis.getRange();
             if (!range.contains(value)) {
                 return;
             }
 
-            double v = rangeAxis.valueToJava2D(value, dataArea,
+            double v = axis.valueToJava2D(value, dataArea,
                     plot.getRangeAxisEdge());
             PlotOrientation orientation = plot.getOrientation();
             Line2D line = null;
@@ -1340,15 +1340,15 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
                 g2.setPaint(marker.getLabelPaint());
 				Rectangle2D markerArea = line.getBounds2D();
 				RectangleInsets markerOffset = marker.getLabelOffset();
-				LengthAdjustmentType labelOffsetForRange = LengthAdjustmentType.EXPAND;
+				LengthAdjustmentType labelOffsetType = LengthAdjustmentType.EXPAND;
 				Rectangle2D anchorRect = null;
 				if (orientation == PlotOrientation.HORIZONTAL) {
 				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-				            labelOffsetForRange, LengthAdjustmentType.CONTRACT);
+				            labelOffsetType, LengthAdjustmentType.CONTRACT);
 				}
 				else if (orientation == PlotOrientation.VERTICAL) {
 				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-				            LengthAdjustmentType.CONTRACT, labelOffsetForRange);
+				            LengthAdjustmentType.CONTRACT, labelOffsetType);
 				}
                 Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
                 TextUtilities.drawAlignedString(label, g2,
@@ -1361,14 +1361,14 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
             IntervalMarker im = (IntervalMarker) marker;
             double start = im.getStartValue();
             double end = im.getEndValue();
-            Range range = rangeAxis.getRange();
+            Range range = axis.getRange();
             if (!(range.intersects(start, end))) {
                 return;
             }
 
-            double start2d = rangeAxis.valueToJava2D(start, dataArea,
+            double start2d = axis.valueToJava2D(start, dataArea,
                     plot.getRangeAxisEdge());
-            double end2d = rangeAxis.valueToJava2D(end, dataArea,
+            double end2d = axis.valueToJava2D(end, dataArea,
                     plot.getRangeAxisEdge());
             double low = Math.min(start2d, end2d);
             double high = Math.max(start2d, end2d);
@@ -1450,15 +1450,15 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
                 g2.setFont(labelFont);
                 g2.setPaint(marker.getLabelPaint());
 				RectangleInsets markerOffset = marker.getLabelOffset();
-				LengthAdjustmentType labelOffsetForRange = marker.getLabelOffsetType();
+				LengthAdjustmentType labelOffsetType = marker.getLabelOffsetType();
 				Rectangle2D anchorRect = null;
 				if (orientation == PlotOrientation.HORIZONTAL) {
 				    anchorRect = markerOffset.createAdjustedRectangle(rect,
-				            labelOffsetForRange, LengthAdjustmentType.CONTRACT);
+				            labelOffsetType, LengthAdjustmentType.CONTRACT);
 				}
 				else if (orientation == PlotOrientation.VERTICAL) {
 				    anchorRect = markerOffset.createAdjustedRectangle(rect,
-				            LengthAdjustmentType.CONTRACT, labelOffsetForRange);
+				            LengthAdjustmentType.CONTRACT, labelOffsetType);
 				}
                 Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
                 TextUtilities.drawAlignedString(label, g2,
