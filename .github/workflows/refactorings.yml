@@ -1,0 +1,20 @@
+name: Refactoring Report
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+  actions: read
+concurrency:
+  group: refactoring-pages-publish
+  cancel-in-progress: false
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Pogut/refactoringminer-action@main
+        with:
+          image: tsantalis/refactoringminer:latest
