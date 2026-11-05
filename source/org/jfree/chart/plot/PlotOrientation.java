@@ -160,5 +160,9 @@ public final class PlotOrientation implements Serializable {
         }
         return result;
     }
+    
+    public PlotOrientation getOpposite() {
+    	return this == HORIZONTAL ? VERTICAL : HORIZONTAL;
+    }
 
 }
