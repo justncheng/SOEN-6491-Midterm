@@ -185,6 +185,7 @@ import org.jfree.ui.GradientPaintTransformer;
 import org.jfree.ui.Layer;
 import org.jfree.ui.LengthAdjustmentType;
 import org.jfree.ui.RectangleAnchor;
+import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.util.ObjectUtilities;
 import org.jfree.util.PublicCloneable;
@@ -1303,7 +1304,10 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
     @Override
     public void drawRangeMarker(Graphics2D g2, XYPlot plot, ValueAxis axis,
             Marker marker, Rectangle2D dataArea) {
-
+    	
+    	PlotOrientation orientation = plot.getOrientation();
+    	RectangleEdge edge = plot.getRangeAxisEdge();
+    	
         if (marker instanceof ValueMarker) {
             ValueMarker vm = (ValueMarker) marker;
             double value = vm.getValue();
@@ -1313,8 +1317,7 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
             }
 
             double v = axis.valueToJava2D(value, dataArea,
-                    plot.getRangeAxisEdge());
-            PlotOrientation orientation = plot.getOrientation();
+                    edge);
             Line2D line = null;
             if (orientation == PlotOrientation.HORIZONTAL) {
                 line = new Line2D.Double(v, dataArea.getMinY(), v,
@@ -1367,13 +1370,12 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
             }
 
             double start2d = axis.valueToJava2D(start, dataArea,
-                    plot.getRangeAxisEdge());
+                    edge);
             double end2d = axis.valueToJava2D(end, dataArea,
-                    plot.getRangeAxisEdge());
+                    edge);
             double low = Math.min(start2d, end2d);
             double high = Math.max(start2d, end2d);
 
-            PlotOrientation orientation = plot.getOrientation();
             Rectangle2D rect = null;
             if (orientation == PlotOrientation.HORIZONTAL) {
                 // clip left and right bounds to data area
