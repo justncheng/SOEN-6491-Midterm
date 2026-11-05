@@ -4155,16 +4155,16 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	        g2.setPaint(marker.getPaint());
 	        g2.setStroke(marker.getStroke());
 	        g2.draw(line);
-	
+        	
+			Rectangle2D markerArea = line.getBounds2D();
+			LengthAdjustmentType labelOffsetType = LengthAdjustmentType.EXPAND;
 	        String label = marker.getLabel();
 	        RectangleAnchor anchor = marker.getLabelAnchor();
 	        if (label != null) {
 	            Font labelFont = marker.getLabelFont();
 	            g2.setFont(labelFont);
 	            g2.setPaint(marker.getLabelPaint());
-				Rectangle2D markerArea = line.getBounds2D();
 				RectangleInsets markerOffset = marker.getLabelOffset();
-				LengthAdjustmentType labelOffsetType = LengthAdjustmentType.EXPAND;
 				Rectangle2D anchorRect = null;
 				if (orientation == PlotOrientation.HORIZONTAL) {
 				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
