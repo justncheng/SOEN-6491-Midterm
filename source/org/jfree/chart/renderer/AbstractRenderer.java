@@ -4128,7 +4128,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
         }
     }
 
-	protected void drawRanger(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, Marker marker, Rectangle2D dataArea) {
+	protected void drawMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, Marker marker, Rectangle2D dataArea) {
 		if (marker instanceof ValueMarker) {
 	        ValueMarker vm = (ValueMarker) marker;
 	        double value = vm.getValue();

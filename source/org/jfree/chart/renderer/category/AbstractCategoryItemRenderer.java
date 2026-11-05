@@ -960,7 +960,7 @@ public abstract class AbstractCategoryItemRenderer extends AbstractRenderer
     	PlotOrientation orientation = plot.getOrientation();
     	RectangleEdge edge = plot.getRangeAxisEdge();
     	
-        drawRanger(g2, orientation, edge, axis, marker, dataArea);
+        drawMarker(g2, orientation, edge, axis, marker, dataArea);
     }
 
 	/**
