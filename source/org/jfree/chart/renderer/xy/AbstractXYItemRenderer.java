@@ -1308,7 +1308,12 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
     	PlotOrientation orientation = plot.getOrientation();
     	RectangleEdge edge = plot.getRangeAxisEdge();
     	
-        if (marker instanceof ValueMarker) {
+        drawRangerMarker(g2, orientation, edge, axis, marker, dataArea);
+    }
+
+	protected void drawRangerMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis,
+			Marker marker, Rectangle2D dataArea) {
+		if (marker instanceof ValueMarker) {
             ValueMarker vm = (ValueMarker) marker;
             double value = vm.getValue();
             Range range = axis.getRange();
@@ -1469,7 +1474,7 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
             }
             g2.setComposite(originalComposite);
         }
-    }
+	}
 
     /**
      * Calculates the (x, y) coordinates for drawing a marker label.
