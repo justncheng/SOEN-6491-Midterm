@@ -1308,7 +1308,7 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
     	PlotOrientation orientation = plot.getOrientation();
     	RectangleEdge edge = plot.getRangeAxisEdge();
     	
-        drawRangerMarker(g2, orientation, edge, axis, marker, dataArea);
+        drawRanger(g2, orientation, edge, axis, marker, dataArea);
     }
 
 	/**
