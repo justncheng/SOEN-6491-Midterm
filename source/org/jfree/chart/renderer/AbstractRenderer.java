@@ -97,12 +97,17 @@
 
 package org.jfree.chart.renderer;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
@@ -118,16 +123,27 @@ import java.util.Map;
 import javax.swing.event.EventListenerList;
 
 import org.jfree.chart.HashUtilities;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.event.RendererChangeEvent;
 import org.jfree.chart.event.RendererChangeListener;
 import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.plot.DrawingSupplier;
+import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.plot.Marker;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.util.CloneUtils;
 import org.jfree.chart.util.ParamChecks;
+import org.jfree.data.Range;
 import org.jfree.io.SerialUtilities;
+import org.jfree.text.TextUtilities;
+import org.jfree.ui.GradientPaintTransformer;
+import org.jfree.ui.LengthAdjustmentType;
+import org.jfree.ui.RectangleAnchor;
+import org.jfree.ui.RectangleEdge;
+import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.TextAnchor;
 import org.jfree.util.BooleanList;
 import org.jfree.util.ObjectUtilities;
@@ -4111,5 +4127,169 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
             fireChangeEvent();
         }
     }
+
+	protected void drawRangerMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, Marker marker, Rectangle2D dataArea) {
+		if (marker instanceof ValueMarker) {
+	        ValueMarker vm = (ValueMarker) marker;
+	        double value = vm.getValue();
+	        Range range = axis.getRange();
+	        if (!range.contains(value)) {
+	            return;
+	        }
+	
+	        double v = axis.valueToJava2D(value, dataArea,
+	                edge);
+	        Line2D line = null;
+	        if (orientation == PlotOrientation.HORIZONTAL) {
+	            line = new Line2D.Double(v, dataArea.getMinY(), v,
+	                    dataArea.getMaxY());
+	        }
+	        else if (orientation == PlotOrientation.VERTICAL) {
+	            line = new Line2D.Double(dataArea.getMinX(), v,
+	                    dataArea.getMaxX(), v);
+	        }
+	
+	        final Composite originalComposite = g2.getComposite();
+	        g2.setComposite(AlphaComposite.getInstance(
+	                AlphaComposite.SRC_OVER, marker.getAlpha()));
+	        g2.setPaint(marker.getPaint());
+	        g2.setStroke(marker.getStroke());
+	        g2.draw(line);
+	
+	        String label = marker.getLabel();
+	        RectangleAnchor anchor = marker.getLabelAnchor();
+	        if (label != null) {
+	            Font labelFont = marker.getLabelFont();
+	            g2.setFont(labelFont);
+	            g2.setPaint(marker.getLabelPaint());
+				Rectangle2D markerArea = line.getBounds2D();
+				RectangleInsets markerOffset = marker.getLabelOffset();
+				LengthAdjustmentType labelOffsetType = LengthAdjustmentType.EXPAND;
+				Rectangle2D anchorRect = null;
+				if (orientation == PlotOrientation.HORIZONTAL) {
+				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
+				            labelOffsetType, LengthAdjustmentType.CONTRACT);
+				}
+				else if (orientation == PlotOrientation.VERTICAL) {
+				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
+				            LengthAdjustmentType.CONTRACT, labelOffsetType);
+				}
+	            Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
+	            TextUtilities.drawAlignedString(label, g2,
+	                    (float) coordinates.getX(), (float) coordinates.getY(),
+	                    marker.getLabelTextAnchor());
+	        }
+	        g2.setComposite(originalComposite);
+	    }
+	    else if (marker instanceof IntervalMarker) {
+	        IntervalMarker im = (IntervalMarker) marker;
+	        double start = im.getStartValue();
+	        double end = im.getEndValue();
+	        Range range = axis.getRange();
+	        if (!(range.intersects(start, end))) {
+	            return;
+	        }
+	
+	        double start2d = axis.valueToJava2D(start, dataArea,
+	                edge);
+	        double end2d = axis.valueToJava2D(end, dataArea,
+	                edge);
+	        double low = Math.min(start2d, end2d);
+	        double high = Math.max(start2d, end2d);
+	
+	        Rectangle2D rect = null;
+	        if (orientation == PlotOrientation.HORIZONTAL) {
+	            // clip left and right bounds to data area
+	            low = Math.max(low, dataArea.getMinX());
+	            high = Math.min(high, dataArea.getMaxX());
+	            rect = new Rectangle2D.Double(low,
+	                    dataArea.getMinY(), high - low,
+	                    dataArea.getHeight());
+	        }
+	        else if (orientation == PlotOrientation.VERTICAL) {
+	            // clip top and bottom bounds to data area
+	            low = Math.max(low, dataArea.getMinY());
+	            high = Math.min(high, dataArea.getMaxY());
+	            rect = new Rectangle2D.Double(dataArea.getMinX(),
+	                    low, dataArea.getWidth(),
+	                    high - low);
+	        }
+	
+	        final Composite originalComposite = g2.getComposite();
+	        g2.setComposite(AlphaComposite.getInstance(
+	                AlphaComposite.SRC_OVER, marker.getAlpha()));
+	        Paint p = marker.getPaint();
+	        if (p instanceof GradientPaint) {
+	            GradientPaint gp = (GradientPaint) p;
+	            GradientPaintTransformer t = im.getGradientPaintTransformer();
+	            if (t != null) {
+	                gp = t.transform(gp, rect);
+	            }
+	            g2.setPaint(gp);
+	        }
+	        else {
+	            g2.setPaint(p);
+	        }
+	        g2.fill(rect);
+	
+	        // now draw the outlines, if visible...
+	        if (im.getOutlinePaint() != null && im.getOutlineStroke() != null) {
+	            if (orientation == PlotOrientation.VERTICAL) {
+	                Line2D line = new Line2D.Double();
+	                double x0 = dataArea.getMinX();
+	                double x1 = dataArea.getMaxX();
+	                g2.setPaint(im.getOutlinePaint());
+	                g2.setStroke(im.getOutlineStroke());
+	                if (range.contains(start)) {
+	                    line.setLine(x0, start2d, x1, start2d);
+	                    g2.draw(line);
+	                }
+	                if (range.contains(end)) {
+	                    line.setLine(x0, end2d, x1, end2d);
+	                    g2.draw(line);
+	                }
+	            }
+	            else if (orientation == PlotOrientation.HORIZONTAL) {
+	                Line2D line = new Line2D.Double();
+	                double y0 = dataArea.getMinY();
+	                double y1 = dataArea.getMaxY();
+	                g2.setPaint(im.getOutlinePaint());
+	                g2.setStroke(im.getOutlineStroke());
+	                if (range.contains(start)) {
+	                    line.setLine(start2d, y0, start2d, y1);
+	                    g2.draw(line);
+	                }
+	                if (range.contains(end)) {
+	                    line.setLine(end2d, y0, end2d, y1);
+	                    g2.draw(line);
+	                }
+	            }
+	        }
+	
+	        String label = marker.getLabel();
+	        RectangleAnchor anchor = marker.getLabelAnchor();
+	        if (label != null) {
+	            Font labelFont = marker.getLabelFont();
+	            g2.setFont(labelFont);
+	            g2.setPaint(marker.getLabelPaint());
+				RectangleInsets markerOffset = marker.getLabelOffset();
+				LengthAdjustmentType labelOffsetType = marker.getLabelOffsetType();
+				Rectangle2D anchorRect = null;
+				if (orientation == PlotOrientation.HORIZONTAL) {
+				    anchorRect = markerOffset.createAdjustedRectangle(rect,
+				            labelOffsetType, LengthAdjustmentType.CONTRACT);
+				}
+				else if (orientation == PlotOrientation.VERTICAL) {
+				    anchorRect = markerOffset.createAdjustedRectangle(rect,
+				            LengthAdjustmentType.CONTRACT, labelOffsetType);
+				}
+	            Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
+	            TextUtilities.drawAlignedString(label, g2,
+	                    (float) coordinates.getX(), (float) coordinates.getY(),
+	                    marker.getLabelTextAnchor());
+	        }
+	        g2.setComposite(originalComposite);
+	    }
+	}
 
 }
