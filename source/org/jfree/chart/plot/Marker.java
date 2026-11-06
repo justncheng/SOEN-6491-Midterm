@@ -61,11 +61,14 @@
 
 package org.jfree.chart.plot;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -82,6 +85,7 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.event.MarkerChangeEvent;
 import org.jfree.chart.event.MarkerChangeListener;
 import org.jfree.chart.util.ParamChecks;
+import org.jfree.data.Range;
 import org.jfree.io.SerialUtilities;
 import org.jfree.text.TextUtilities;
 import org.jfree.ui.LengthAdjustmentType;
@@ -702,7 +706,38 @@ public abstract class Marker implements Cloneable, Serializable {
     
     public void draw(Graphics2D g2, PlotOrientation orientation,
             RectangleEdge edge, ValueAxis axis, Rectangle2D dataArea) {
+    	if (!isInRange(axis.getRange())) {
+            return;
+        }
+        Shape shape = createMarkerShape(orientation, edge, axis, dataArea);
+        final Composite originalComposite = g2.getComposite();
+        g2.setComposite(AlphaComposite.getInstance(
+                AlphaComposite.SRC_OVER, getAlpha()));
+        drawMarkerShape(g2, shape, orientation, edge, axis, dataArea);
+        drawMarkerLabel(g2, orientation, shape.getBounds2D(),
+                getDrawnLabelOffsetType());
+        g2.setComposite(originalComposite);
     }
+    
+    protected boolean isInRange(Range range) {
+        return false;
+    }
+
+    protected Shape createMarkerShape(PlotOrientation orientation,
+            RectangleEdge edge, ValueAxis axis, Rectangle2D dataArea) {
+        return null;
+    }
+
+    protected void drawMarkerShape(Graphics2D g2, Shape shape,
+            PlotOrientation orientation, RectangleEdge edge, ValueAxis axis,
+            Rectangle2D dataArea) {
+        // by default, there is no shape to draw
+    }
+
+    protected LengthAdjustmentType getDrawnLabelOffsetType() {
+        return getLabelOffsetType();
+    }
+    
     
 	protected Line2D createMarkerLine(PlotOrientation orientation, double position, Rectangle2D dataArea) {
 		Line2D line = null;

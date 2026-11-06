@@ -49,8 +49,8 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 
 import org.jfree.chart.axis.ValueAxis;
@@ -164,36 +164,29 @@ public class ValueMarker extends Marker {
         return true;
     }
     
-    /**
-     * 
-     * @param g2
-     * @param orientation
-     * @param edge
-     * @param axis
-     * @param dataArea
-     */
     @Override
-    public void draw(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, 
-    		Rectangle2D dataArea) {
-    	
-		double value = getValue();
-		Range range = axis.getRange();
-		if (!range.contains(value)) {
-		    return;
-		}
+    protected boolean isInRange(Range range) {
+        return range.contains(getValue());
+    }
 
-		double v = axis.valueToJava2D(value, dataArea,
-		        edge);
-		Line2D line = createMarkerLine(orientation, v, dataArea);
+    @Override
+    protected Shape createMarkerShape(PlotOrientation orientation,
+            RectangleEdge edge, ValueAxis axis, Rectangle2D dataArea) {
+        double v = axis.valueToJava2D(getValue(), dataArea, edge);
+        return createMarkerLine(orientation, v, dataArea);
+    }
 
-		final Composite originalComposite = g2.getComposite();
-		g2.setComposite(AlphaComposite.getInstance(
-		        AlphaComposite.SRC_OVER, getAlpha()));
-		g2.setPaint(getPaint());
-		g2.setStroke(getStroke());
-		g2.draw(line);
-		
-		drawMarkerLabel(g2, orientation, line.getBounds2D(), LengthAdjustmentType.EXPAND);
-		g2.setComposite(originalComposite);
-	}
+    @Override
+    protected void drawMarkerShape(Graphics2D g2, Shape shape,
+            PlotOrientation orientation, RectangleEdge edge, ValueAxis axis,
+            Rectangle2D dataArea) {
+        g2.setPaint(getPaint());
+        g2.setStroke(getStroke());
+        g2.draw(shape);
+    }
+
+    @Override
+    protected LengthAdjustmentType getDrawnLabelOffsetType() {
+        return LengthAdjustmentType.EXPAND;
+    }
 }
