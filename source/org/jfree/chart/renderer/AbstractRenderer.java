@@ -4163,7 +4163,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 		// now draw the outlines, if visible...
 		drawIntervalOutlines(g2, orientation, dataArea, im, range, start2d, end2d);
 		
-		drawMarkerLabel(g2, orientation, im, rect, im.getLabelOffsetType());
+		im.drawMarkerLabel(g2, orientation, rect, im.getLabelOffsetType());
 		g2.setComposite(originalComposite);
 	}
 
@@ -4177,7 +4177,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 
 		double v = axis.valueToJava2D(value, dataArea,
 		        edge);
-		Line2D line = createMarkerLine(orientation, v, dataArea);
+		Line2D line = vm.createMarkerLine(orientation, v, dataArea);
 
 		final Composite originalComposite = g2.getComposite();
 		g2.setComposite(AlphaComposite.getInstance(
@@ -4186,7 +4186,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 		g2.setStroke(vm.getStroke());
 		g2.draw(line);
 		
-		drawMarkerLabel(g2, orientation, vm, line.getBounds2D(), LengthAdjustmentType.EXPAND);
+		vm.drawMarkerLabel(g2, orientation, line.getBounds2D(), LengthAdjustmentType.EXPAND);
 		g2.setComposite(originalComposite);
 	}
 
@@ -4196,10 +4196,10 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 		    g2.setPaint(im.getOutlinePaint());
 		    g2.setStroke(im.getOutlineStroke());
 		    if (range.contains(im.getStartValue())) {
-		        g2.draw(createMarkerLine(orientation, start2d, dataArea));
+		        g2.draw(im.createMarkerLine(orientation, start2d, dataArea));
 		    }
 		    if (range.contains(im.getEndValue())) {
-		        g2.draw(createMarkerLine(orientation, end2d, dataArea));
+		        g2.draw(im.createMarkerLine(orientation, end2d, dataArea));
 		    }
 		}
 	}
