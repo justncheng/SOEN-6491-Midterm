@@ -67,6 +67,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -81,6 +83,7 @@ import org.jfree.chart.event.MarkerChangeEvent;
 import org.jfree.chart.event.MarkerChangeListener;
 import org.jfree.chart.util.ParamChecks;
 import org.jfree.io.SerialUtilities;
+import org.jfree.text.TextUtilities;
 import org.jfree.ui.LengthAdjustmentType;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
@@ -700,5 +703,43 @@ public abstract class Marker implements Cloneable, Serializable {
     public void draw(Graphics2D g2, PlotOrientation orientation,
             RectangleEdge edge, ValueAxis axis, Rectangle2D dataArea) {
     }
+    
+	public Line2D createMarkerLine(PlotOrientation orientation, double position, Rectangle2D dataArea) {
+		Line2D line = null;
+		if (orientation == PlotOrientation.HORIZONTAL) {
+		    line = new Line2D.Double(position, dataArea.getMinY(), position,
+		            dataArea.getMaxY());
+		}
+		else if (orientation == PlotOrientation.VERTICAL) {
+		    line = new Line2D.Double(dataArea.getMinX(), position,
+		            dataArea.getMaxX(), position);
+		}
+		return line;
+	}
+
+	public void drawMarkerLabel(Graphics2D g2, PlotOrientation orientation, Rectangle2D markerArea,
+			LengthAdjustmentType labelOffsetType) {
+		String label = getLabel();
+		RectangleAnchor anchor = getLabelAnchor();
+		if (label != null) {
+		    Font labelFont = getLabelFont();
+		    g2.setFont(labelFont);
+		    g2.setPaint(getLabelPaint());
+			RectangleInsets markerOffset = getLabelOffset();
+			Rectangle2D anchorRect = null;
+			if (orientation == PlotOrientation.HORIZONTAL) {
+			    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
+			            labelOffsetType, LengthAdjustmentType.CONTRACT);
+			}
+			else if (orientation == PlotOrientation.VERTICAL) {
+			    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
+			            LengthAdjustmentType.CONTRACT, labelOffsetType);
+			}
+		    Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
+		    TextUtilities.drawAlignedString(label, g2,
+		            (float) coordinates.getX(), (float) coordinates.getY(),
+		            getLabelTextAnchor());
+		}
+	}
 
 }
