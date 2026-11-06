@@ -4131,92 +4131,117 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	protected void drawMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, Marker marker, Rectangle2D dataArea) {
 		if (marker instanceof ValueMarker) {
 	        ValueMarker vm = (ValueMarker) marker;
-	        double value = vm.getValue();
-	        Range range = axis.getRange();
-	        if (!range.contains(value)) {
-	            return;
-	        }
-	
-	        double v = axis.valueToJava2D(value, dataArea,
-	                edge);
-	        Line2D line = createMarkerLine(orientation, v, dataArea);
-	
-	        final Composite originalComposite = g2.getComposite();
-	        g2.setComposite(AlphaComposite.getInstance(
-	                AlphaComposite.SRC_OVER, marker.getAlpha()));
-	        g2.setPaint(marker.getPaint());
-	        g2.setStroke(marker.getStroke());
-	        g2.draw(line);
-        	
-			drawMarkerLabel(g2, orientation, marker, line.getBounds2D(), LengthAdjustmentType.EXPAND);
-	        g2.setComposite(originalComposite);
+	        drawValueMarker(g2, orientation, edge, axis, vm, dataArea);
 	    }
 	    else if (marker instanceof IntervalMarker) {
 	        IntervalMarker im = (IntervalMarker) marker;
-	        double start = im.getStartValue();
-	        double end = im.getEndValue();
-	        Range range = axis.getRange();
-	        if (!(range.intersects(start, end))) {
-	            return;
-	        }
-	
-	        double start2d = axis.valueToJava2D(start, dataArea,
-	                edge);
-	        double end2d = axis.valueToJava2D(end, dataArea,
-	                edge);
-	        double low = Math.min(start2d, end2d);
-	        double high = Math.max(start2d, end2d);
-	
-	        Rectangle2D rect = null;
-	        if (orientation == PlotOrientation.HORIZONTAL) {
-	            // clip left and right bounds to data area
-	            low = Math.max(low, dataArea.getMinX());
-	            high = Math.min(high, dataArea.getMaxX());
-	            rect = new Rectangle2D.Double(low,
-	                    dataArea.getMinY(), high - low,
-	                    dataArea.getHeight());
-	        }
-	        else if (orientation == PlotOrientation.VERTICAL) {
-	            // clip top and bottom bounds to data area
-	            low = Math.max(low, dataArea.getMinY());
-	            high = Math.min(high, dataArea.getMaxY());
-	            rect = new Rectangle2D.Double(dataArea.getMinX(),
-	                    low, dataArea.getWidth(),
-	                    high - low);
-	        }
-	
-	        final Composite originalComposite = g2.getComposite();
-	        g2.setComposite(AlphaComposite.getInstance(
-	                AlphaComposite.SRC_OVER, marker.getAlpha()));
-	        Paint p = marker.getPaint();
-	        if (p instanceof GradientPaint) {
-	            GradientPaint gp = (GradientPaint) p;
-	            GradientPaintTransformer t = im.getGradientPaintTransformer();
-	            if (t != null) {
-	                gp = t.transform(gp, rect);
-	            }
-	            g2.setPaint(gp);
-	        }
-	        else {
-	            g2.setPaint(p);
-	        }
-	        g2.fill(rect);
-	
-	        // now draw the outlines, if visible...
-	        if (im.getOutlinePaint() != null && im.getOutlineStroke() != null) {
-                g2.setPaint(im.getOutlinePaint());
-                g2.setStroke(im.getOutlineStroke());
-                if (range.contains(start)) {
-                    g2.draw(createMarkerLine(orientation, start2d, dataArea));
-                }
-                if (range.contains(end)) {
-                    g2.draw(createMarkerLine(orientation, end2d, dataArea));
-                }
-	        }
-	        
-	        drawMarkerLabel(g2, orientation, marker, rect, marker.getLabelOffsetType());
-	        g2.setComposite(originalComposite);
+	        drawIntervalMarker(g2, orientation, edge, axis, im, dataArea);
 	    }
+	}
+
+	private void drawIntervalMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis,
+			IntervalMarker im, Rectangle2D dataArea) {
+		double start = im.getStartValue();
+		double end = im.getEndValue();
+		Range range = axis.getRange();
+		if (!(range.intersects(start, end))) {
+		    return;
+		}
+
+		double start2d = axis.valueToJava2D(start, dataArea,
+		        edge);
+		double end2d = axis.valueToJava2D(end, dataArea,
+		        edge);
+		Rectangle2D rect = createMarkerRectangle(orientation, dataArea, start2d, end2d);
+
+		final Composite originalComposite = g2.getComposite();
+		g2.setComposite(AlphaComposite.getInstance(
+		        AlphaComposite.SRC_OVER, im.getAlpha()));
+		applyIntervalPaint(g2, im, rect);
+		g2.fill(rect);
+
+		// now draw the outlines, if visible...
+		drawIntervalOutlines(g2, orientation, dataArea, im, range, start2d, end2d);
+		
+		drawMarkerLabel(g2, orientation, im, rect, im.getLabelOffsetType());
+		g2.setComposite(originalComposite);
+	}
+
+	private void drawValueMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis,
+			ValueMarker vm, Rectangle2D dataArea) {
+		double value = vm.getValue();
+		Range range = axis.getRange();
+		if (!range.contains(value)) {
+		    return;
+		}
+
+		double v = axis.valueToJava2D(value, dataArea,
+		        edge);
+		Line2D line = createMarkerLine(orientation, v, dataArea);
+
+		final Composite originalComposite = g2.getComposite();
+		g2.setComposite(AlphaComposite.getInstance(
+		        AlphaComposite.SRC_OVER, vm.getAlpha()));
+		g2.setPaint(vm.getPaint());
+		g2.setStroke(vm.getStroke());
+		g2.draw(line);
+		
+		drawMarkerLabel(g2, orientation, vm, line.getBounds2D(), LengthAdjustmentType.EXPAND);
+		g2.setComposite(originalComposite);
+	}
+
+	private void drawIntervalOutlines(Graphics2D g2, PlotOrientation orientation, Rectangle2D dataArea,
+			IntervalMarker im, Range range, double start2d, double end2d) {
+		if (im.getOutlinePaint() != null && im.getOutlineStroke() != null) {
+		    g2.setPaint(im.getOutlinePaint());
+		    g2.setStroke(im.getOutlineStroke());
+		    if (range.contains(im.getStartValue())) {
+		        g2.draw(createMarkerLine(orientation, start2d, dataArea));
+		    }
+		    if (range.contains(im.getEndValue())) {
+		        g2.draw(createMarkerLine(orientation, end2d, dataArea));
+		    }
+		}
+	}
+
+	private void applyIntervalPaint(Graphics2D g2, IntervalMarker im, Rectangle2D rect) {
+		Paint p = im.getPaint();
+		if (p instanceof GradientPaint) {
+		    GradientPaint gp = (GradientPaint) p;
+		    GradientPaintTransformer t = im.getGradientPaintTransformer();
+		    if (t != null) {
+		        gp = t.transform(gp, rect);
+		    }
+		    g2.setPaint(gp);
+		}
+		else {
+		    g2.setPaint(p);
+		}
+	}
+
+	private Rectangle2D createMarkerRectangle(PlotOrientation orientation, Rectangle2D dataArea, double start2d,
+			double end2d) {
+		double low = Math.min(start2d, end2d);
+		double high = Math.max(start2d, end2d);
+
+		Rectangle2D rect = null;
+		if (orientation == PlotOrientation.HORIZONTAL) {
+		    // clip left and right bounds to data area
+		    low = Math.max(low, dataArea.getMinX());
+		    high = Math.min(high, dataArea.getMaxX());
+		    rect = new Rectangle2D.Double(low,
+		            dataArea.getMinY(), high - low,
+		            dataArea.getHeight());
+		}
+		else if (orientation == PlotOrientation.VERTICAL) {
+		    // clip top and bottom bounds to data area
+		    low = Math.max(low, dataArea.getMinY());
+		    high = Math.min(high, dataArea.getMaxY());
+		    rect = new Rectangle2D.Double(dataArea.getMinX(),
+		            low, dataArea.getWidth(),
+		            high - low);
+		}
+		return rect;
 	}
 
 	private Line2D createMarkerLine(PlotOrientation orientation, double position, Rectangle2D dataArea) {
