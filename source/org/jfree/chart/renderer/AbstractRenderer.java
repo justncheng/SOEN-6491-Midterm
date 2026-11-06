@@ -4265,7 +4265,9 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	                }
 	            }
 	        }
-	
+	        
+	        Rectangle2D markerArea = rect;
+			LengthAdjustmentType labelOffsetType = marker.getLabelOffsetType();
 	        String label = marker.getLabel();
 	        RectangleAnchor anchor = marker.getLabelAnchor();
 	        if (label != null) {
@@ -4273,14 +4275,13 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	            g2.setFont(labelFont);
 	            g2.setPaint(marker.getLabelPaint());
 				RectangleInsets markerOffset = marker.getLabelOffset();
-				LengthAdjustmentType labelOffsetType = marker.getLabelOffsetType();
 				Rectangle2D anchorRect = null;
 				if (orientation == PlotOrientation.HORIZONTAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(rect,
+				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
 				            labelOffsetType, LengthAdjustmentType.CONTRACT);
 				}
 				else if (orientation == PlotOrientation.VERTICAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(rect,
+				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
 				            LengthAdjustmentType.CONTRACT, labelOffsetType);
 				}
 	            Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
