@@ -4129,14 +4129,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
     }
 
 	protected void drawMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, Marker marker, Rectangle2D dataArea) {
-		if (marker instanceof ValueMarker) {
-	        ValueMarker vm = (ValueMarker) marker;
-	        vm.draw(g2, orientation, edge, axis, dataArea);
-	    }
-	    else if (marker instanceof IntervalMarker) {
-	        IntervalMarker im = (IntervalMarker) marker;
-	        im.draw(g2, orientation, edge, axis, dataArea);
-	    }
+		marker.draw(g2, orientation, edge, axis, dataArea);
 	}
 
 }
