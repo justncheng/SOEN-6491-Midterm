@@ -4139,15 +4139,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	
 	        double v = axis.valueToJava2D(value, dataArea,
 	                edge);
-	        Line2D line = null;
-	        if (orientation == PlotOrientation.HORIZONTAL) {
-	            line = new Line2D.Double(v, dataArea.getMinY(), v,
-	                    dataArea.getMaxY());
-	        }
-	        else if (orientation == PlotOrientation.VERTICAL) {
-	            line = new Line2D.Double(dataArea.getMinX(), v,
-	                    dataArea.getMaxX(), v);
-	        }
+	        Line2D line = extracted(orientation, v, dataArea);
 	
 	        final Composite originalComposite = g2.getComposite();
 	        g2.setComposite(AlphaComposite.getInstance(
@@ -4247,6 +4239,19 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	        drawMarkerLabel(g2, orientation, marker, rect, marker.getLabelOffsetType());
 	        g2.setComposite(originalComposite);
 	    }
+	}
+
+	private Line2D extracted(PlotOrientation orientation, double position, Rectangle2D dataArea) {
+		Line2D line = null;
+		if (orientation == PlotOrientation.HORIZONTAL) {
+		    line = new Line2D.Double(position, dataArea.getMinY(), position,
+		            dataArea.getMaxY());
+		}
+		else if (orientation == PlotOrientation.VERTICAL) {
+		    line = new Line2D.Double(dataArea.getMinX(), position,
+		            dataArea.getMaxX(), position);
+		}
+		return line;
 	}
 
 	private void drawMarkerLabel(Graphics2D g2, PlotOrientation orientation, Marker marker, Rectangle2D markerArea,
