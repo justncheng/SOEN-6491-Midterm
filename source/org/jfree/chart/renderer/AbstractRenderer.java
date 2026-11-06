@@ -4156,9 +4156,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	        g2.setStroke(marker.getStroke());
 	        g2.draw(line);
         	
-			Rectangle2D markerArea = line.getBounds2D();
-			LengthAdjustmentType labelOffsetType = LengthAdjustmentType.EXPAND;
-	        drawMarkerLabel(g2, orientation, marker, markerArea, labelOffsetType);
+			drawMarkerLabel(g2, orientation, marker, line.getBounds2D(), LengthAdjustmentType.EXPAND);
 	        g2.setComposite(originalComposite);
 	    }
 	    else if (marker instanceof IntervalMarker) {
@@ -4246,9 +4244,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	            }
 	        }
 	        
-	        Rectangle2D markerArea = rect;
-			LengthAdjustmentType labelOffsetType = marker.getLabelOffsetType();
-	        drawMarkerLabel(g2, orientation, marker, markerArea, labelOffsetType);
+	        drawMarkerLabel(g2, orientation, marker, rect, marker.getLabelOffsetType());
 	        g2.setComposite(originalComposite);
 	    }
 	}
