@@ -4131,53 +4131,63 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	protected void drawMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, Marker marker, Rectangle2D dataArea) {
 		if (marker instanceof ValueMarker) {
 	        ValueMarker vm = (ValueMarker) marker;
-	        double value = vm.getValue();
-	        Range range = axis.getRange();
-	        if (!range.contains(value)) {
-	            return;
-	        }
-	
-	        double v = axis.valueToJava2D(value, dataArea,
-	                edge);
-	        Line2D line = createMarkerLine(orientation, v, dataArea);
-	
-	        final Composite originalComposite = g2.getComposite();
-	        g2.setComposite(AlphaComposite.getInstance(
-	                AlphaComposite.SRC_OVER, vm.getAlpha()));
-	        g2.setPaint(vm.getPaint());
-	        g2.setStroke(vm.getStroke());
-	        g2.draw(line);
-        	
-			drawMarkerLabel(g2, orientation, vm, line.getBounds2D(), LengthAdjustmentType.EXPAND);
-	        g2.setComposite(originalComposite);
+	        drawValueMarker(g2, orientation, edge, axis, vm, dataArea);
 	    }
 	    else if (marker instanceof IntervalMarker) {
 	        IntervalMarker im = (IntervalMarker) marker;
-	        double start = im.getStartValue();
-	        double end = im.getEndValue();
-	        Range range = axis.getRange();
-	        if (!(range.intersects(start, end))) {
-	            return;
-	        }
-	
-	        double start2d = axis.valueToJava2D(start, dataArea,
-	                edge);
-	        double end2d = axis.valueToJava2D(end, dataArea,
-	                edge);
-	        Rectangle2D rect = createMarkerRectangle(orientation, dataArea, start2d, end2d);
-	
-	        final Composite originalComposite = g2.getComposite();
-	        g2.setComposite(AlphaComposite.getInstance(
-	                AlphaComposite.SRC_OVER, im.getAlpha()));
-	        applyIntervalPaint(g2, im, rect);
-	        g2.fill(rect);
-	
-	        // now draw the outlines, if visible...
-	        drawIntervalOutlines(g2, orientation, dataArea, im, range, start2d, end2d);
-	        
-	        drawMarkerLabel(g2, orientation, im, rect, im.getLabelOffsetType());
-	        g2.setComposite(originalComposite);
+	        drawIntervalMarker(g2, orientation, edge, axis, im, dataArea);
 	    }
+	}
+
+	private void drawIntervalMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis,
+			IntervalMarker im, Rectangle2D dataArea) {
+		double start = im.getStartValue();
+		double end = im.getEndValue();
+		Range range = axis.getRange();
+		if (!(range.intersects(start, end))) {
+		    return;
+		}
+
+		double start2d = axis.valueToJava2D(start, dataArea,
+		        edge);
+		double end2d = axis.valueToJava2D(end, dataArea,
+		        edge);
+		Rectangle2D rect = createMarkerRectangle(orientation, dataArea, start2d, end2d);
+
+		final Composite originalComposite = g2.getComposite();
+		g2.setComposite(AlphaComposite.getInstance(
+		        AlphaComposite.SRC_OVER, im.getAlpha()));
+		applyIntervalPaint(g2, im, rect);
+		g2.fill(rect);
+
+		// now draw the outlines, if visible...
+		drawIntervalOutlines(g2, orientation, dataArea, im, range, start2d, end2d);
+		
+		drawMarkerLabel(g2, orientation, im, rect, im.getLabelOffsetType());
+		g2.setComposite(originalComposite);
+	}
+
+	private void drawValueMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis,
+			ValueMarker vm, Rectangle2D dataArea) {
+		double value = vm.getValue();
+		Range range = axis.getRange();
+		if (!range.contains(value)) {
+		    return;
+		}
+
+		double v = axis.valueToJava2D(value, dataArea,
+		        edge);
+		Line2D line = createMarkerLine(orientation, v, dataArea);
+
+		final Composite originalComposite = g2.getComposite();
+		g2.setComposite(AlphaComposite.getInstance(
+		        AlphaComposite.SRC_OVER, vm.getAlpha()));
+		g2.setPaint(vm.getPaint());
+		g2.setStroke(vm.getStroke());
+		g2.draw(line);
+		
+		drawMarkerLabel(g2, orientation, vm, line.getBounds2D(), LengthAdjustmentType.EXPAND);
+		g2.setComposite(originalComposite);
 	}
 
 	private void drawIntervalOutlines(Graphics2D g2, PlotOrientation orientation, Rectangle2D dataArea,
