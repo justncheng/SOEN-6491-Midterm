@@ -704,7 +704,7 @@ public abstract class Marker implements Cloneable, Serializable {
             RectangleEdge edge, ValueAxis axis, Rectangle2D dataArea) {
     }
     
-	public Line2D createMarkerLine(PlotOrientation orientation, double position, Rectangle2D dataArea) {
+	protected Line2D createMarkerLine(PlotOrientation orientation, double position, Rectangle2D dataArea) {
 		Line2D line = null;
 		if (orientation == PlotOrientation.HORIZONTAL) {
 		    line = new Line2D.Double(position, dataArea.getMinY(), position,
@@ -717,7 +717,7 @@ public abstract class Marker implements Cloneable, Serializable {
 		return line;
 	}
 
-	public void drawMarkerLabel(Graphics2D g2, PlotOrientation orientation, Rectangle2D markerArea,
+	protected void drawMarkerLabel(Graphics2D g2, PlotOrientation orientation, Rectangle2D markerArea,
 			LengthAdjustmentType labelOffsetType) {
 		String label = getLabel();
 		RectangleAnchor anchor = getLabelAnchor();
