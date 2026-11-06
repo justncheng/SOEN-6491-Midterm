@@ -4128,8 +4128,4 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
         }
     }
 
-	protected void drawMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, Marker marker, Rectangle2D dataArea) {
-		marker.draw(g2, orientation, edge, axis, dataArea);
-	}
-
 }

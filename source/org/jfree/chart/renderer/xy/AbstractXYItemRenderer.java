@@ -1089,7 +1089,7 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
 
     	PlotOrientation orientation = plot.getOrientation().getOpposite();
     	RectangleEdge edge = plot.getDomainAxisEdge();
-    	drawMarker(g2, orientation, edge, domainAxis, marker, dataArea);
+    	marker.draw(g2, orientation, edge, domainAxis, dataArea);
 
     }
 
@@ -1140,7 +1140,7 @@ public abstract class AbstractXYItemRenderer extends AbstractRenderer
     	PlotOrientation orientation = plot.getOrientation();
     	RectangleEdge edge = plot.getRangeAxisEdge();
     	
-        drawMarker(g2, orientation, edge, axis, marker, dataArea);
+        marker.draw(g2, orientation, edge, axis, dataArea);
     }
 
 	/**
