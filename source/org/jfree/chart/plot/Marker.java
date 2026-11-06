@@ -61,8 +61,10 @@
 
 package org.jfree.chart.plot;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -704,6 +706,17 @@ public abstract class Marker implements Cloneable, Serializable {
     
     public void draw(Graphics2D g2, PlotOrientation orientation,
             RectangleEdge edge, ValueAxis axis, Rectangle2D dataArea) {
+    	if (!isInRange(axis.getRange())) {
+            return;
+        }
+        Shape shape = createMarkerShape(orientation, edge, axis, dataArea);
+        final Composite originalComposite = g2.getComposite();
+        g2.setComposite(AlphaComposite.getInstance(
+                AlphaComposite.SRC_OVER, getAlpha()));
+        drawMarkerShape(g2, shape, orientation, edge, axis, dataArea);
+        drawMarkerLabel(g2, orientation, shape.getBounds2D(),
+                getDrawnLabelOffsetType());
+        g2.setComposite(originalComposite);
     }
     
     protected boolean isInRange(Range range) {

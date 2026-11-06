@@ -240,31 +240,6 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
-    
-    /**
-     * 
-     * @param g2
-     * @param orientation
-     * @param edge
-     * @param axis
-     * @param im
-     * @param dataArea
-     */
-    @Override
-    public void draw(Graphics2D g2, PlotOrientation orientation,
-            RectangleEdge edge, ValueAxis axis, Rectangle2D dataArea) {
-        if (!isInRange(axis.getRange())) {
-            return;
-        }
-        Shape shape = createMarkerShape(orientation, edge, axis, dataArea);
-        final Composite originalComposite = g2.getComposite();
-        g2.setComposite(AlphaComposite.getInstance(
-                AlphaComposite.SRC_OVER, getAlpha()));
-        drawMarkerShape(g2, shape, orientation, edge, axis, dataArea);
-        drawMarkerLabel(g2, orientation, shape.getBounds2D(),
-                getDrawnLabelOffsetType());
-        g2.setComposite(originalComposite);
-    }
 
     @Override
     protected boolean isInRange(Range range) {
