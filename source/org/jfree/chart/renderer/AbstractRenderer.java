@@ -4139,7 +4139,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	
 	        double v = axis.valueToJava2D(value, dataArea,
 	                edge);
-	        Line2D line = extracted(orientation, v, dataArea);
+	        Line2D line = createMarkerLine(orientation, v, dataArea);
 	
 	        final Composite originalComposite = g2.getComposite();
 	        g2.setComposite(AlphaComposite.getInstance(
@@ -4205,33 +4205,24 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	        // now draw the outlines, if visible...
 	        if (im.getOutlinePaint() != null && im.getOutlineStroke() != null) {
 	            if (orientation == PlotOrientation.VERTICAL) {
-	                Line2D line = new Line2D.Double();
-	                double x0 = dataArea.getMinX();
-	                double x1 = dataArea.getMaxX();
 	                g2.setPaint(im.getOutlinePaint());
 	                g2.setStroke(im.getOutlineStroke());
 	                if (range.contains(start)) {
-	                    line.setLine(x0, start2d, x1, start2d);
-	                    g2.draw(line);
+	                    g2.draw(createMarkerLine(orientation, start2d, dataArea));
 	                }
 	                if (range.contains(end)) {
-	                    line.setLine(x0, end2d, x1, end2d);
-	                    g2.draw(line);
+	                    g2.draw(createMarkerLine(orientation, end2d, dataArea));
 	                }
 	            }
 	            else if (orientation == PlotOrientation.HORIZONTAL) {
-	                Line2D line = new Line2D.Double();
-	                double y0 = dataArea.getMinY();
-	                double y1 = dataArea.getMaxY();
+	                
 	                g2.setPaint(im.getOutlinePaint());
 	                g2.setStroke(im.getOutlineStroke());
 	                if (range.contains(start)) {
-	                    line.setLine(start2d, y0, start2d, y1);
-	                    g2.draw(line);
+	                    g2.draw(createMarkerLine(orientation, start2d, dataArea));
 	                }
 	                if (range.contains(end)) {
-	                    line.setLine(end2d, y0, end2d, y1);
-	                    g2.draw(line);
+	                    g2.draw(createMarkerLine(orientation, end2d, dataArea));
 	                }
 	            }
 	        }
@@ -4241,7 +4232,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	    }
 	}
 
-	private Line2D extracted(PlotOrientation orientation, double position, Rectangle2D dataArea) {
+	private Line2D createMarkerLine(PlotOrientation orientation, double position, Rectangle2D dataArea) {
 		Line2D line = null;
 		if (orientation == PlotOrientation.HORIZONTAL) {
 		    line = new Line2D.Double(position, dataArea.getMinY(), position,
