@@ -4143,12 +4143,12 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	
 	        final Composite originalComposite = g2.getComposite();
 	        g2.setComposite(AlphaComposite.getInstance(
-	                AlphaComposite.SRC_OVER, marker.getAlpha()));
-	        g2.setPaint(marker.getPaint());
-	        g2.setStroke(marker.getStroke());
+	                AlphaComposite.SRC_OVER, vm.getAlpha()));
+	        g2.setPaint(vm.getPaint());
+	        g2.setStroke(vm.getStroke());
 	        g2.draw(line);
         	
-			drawMarkerLabel(g2, orientation, marker, line.getBounds2D(), LengthAdjustmentType.EXPAND);
+			drawMarkerLabel(g2, orientation, vm, line.getBounds2D(), LengthAdjustmentType.EXPAND);
 	        g2.setComposite(originalComposite);
 	    }
 	    else if (marker instanceof IntervalMarker) {
@@ -4187,8 +4187,8 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	
 	        final Composite originalComposite = g2.getComposite();
 	        g2.setComposite(AlphaComposite.getInstance(
-	                AlphaComposite.SRC_OVER, marker.getAlpha()));
-	        Paint p = marker.getPaint();
+	                AlphaComposite.SRC_OVER, im.getAlpha()));
+	        Paint p = im.getPaint();
 	        if (p instanceof GradientPaint) {
 	            GradientPaint gp = (GradientPaint) p;
 	            GradientPaintTransformer t = im.getGradientPaintTransformer();
@@ -4206,15 +4206,15 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	        if (im.getOutlinePaint() != null && im.getOutlineStroke() != null) {
                 g2.setPaint(im.getOutlinePaint());
                 g2.setStroke(im.getOutlineStroke());
-                if (range.contains(start)) {
+                if (range.contains(im.getStartValue())) {
                     g2.draw(createMarkerLine(orientation, start2d, dataArea));
                 }
-                if (range.contains(end)) {
+                if (range.contains(im.getEndValue())) {
                     g2.draw(createMarkerLine(orientation, end2d, dataArea));
                 }
 	        }
 	        
-	        drawMarkerLabel(g2, orientation, marker, rect, marker.getLabelOffsetType());
+	        drawMarkerLabel(g2, orientation, im, rect, im.getLabelOffsetType());
 	        g2.setComposite(originalComposite);
 	    }
 	}
