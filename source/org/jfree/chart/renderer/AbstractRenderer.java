@@ -4155,30 +4155,8 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	        g2.setPaint(marker.getPaint());
 	        g2.setStroke(marker.getStroke());
 	        g2.draw(line);
-	
-	        String label = marker.getLabel();
-	        RectangleAnchor anchor = marker.getLabelAnchor();
-	        if (label != null) {
-	            Font labelFont = marker.getLabelFont();
-	            g2.setFont(labelFont);
-	            g2.setPaint(marker.getLabelPaint());
-				Rectangle2D markerArea = line.getBounds2D();
-				RectangleInsets markerOffset = marker.getLabelOffset();
-				LengthAdjustmentType labelOffsetType = LengthAdjustmentType.EXPAND;
-				Rectangle2D anchorRect = null;
-				if (orientation == PlotOrientation.HORIZONTAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-				            labelOffsetType, LengthAdjustmentType.CONTRACT);
-				}
-				else if (orientation == PlotOrientation.VERTICAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-				            LengthAdjustmentType.CONTRACT, labelOffsetType);
-				}
-	            Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
-	            TextUtilities.drawAlignedString(label, g2,
-	                    (float) coordinates.getX(), (float) coordinates.getY(),
-	                    marker.getLabelTextAnchor());
-	        }
+        	
+			drawMarkerLabel(g2, orientation, marker, line.getBounds2D(), LengthAdjustmentType.EXPAND);
 	        g2.setComposite(originalComposite);
 	    }
 	    else if (marker instanceof IntervalMarker) {
@@ -4265,31 +4243,35 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	                }
 	            }
 	        }
-	
-	        String label = marker.getLabel();
-	        RectangleAnchor anchor = marker.getLabelAnchor();
-	        if (label != null) {
-	            Font labelFont = marker.getLabelFont();
-	            g2.setFont(labelFont);
-	            g2.setPaint(marker.getLabelPaint());
-				RectangleInsets markerOffset = marker.getLabelOffset();
-				LengthAdjustmentType labelOffsetType = marker.getLabelOffsetType();
-				Rectangle2D anchorRect = null;
-				if (orientation == PlotOrientation.HORIZONTAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(rect,
-				            labelOffsetType, LengthAdjustmentType.CONTRACT);
-				}
-				else if (orientation == PlotOrientation.VERTICAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(rect,
-				            LengthAdjustmentType.CONTRACT, labelOffsetType);
-				}
-	            Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
-	            TextUtilities.drawAlignedString(label, g2,
-	                    (float) coordinates.getX(), (float) coordinates.getY(),
-	                    marker.getLabelTextAnchor());
-	        }
+	        
+	        drawMarkerLabel(g2, orientation, marker, rect, marker.getLabelOffsetType());
 	        g2.setComposite(originalComposite);
 	    }
+	}
+
+	private void drawMarkerLabel(Graphics2D g2, PlotOrientation orientation, Marker marker, Rectangle2D markerArea,
+			LengthAdjustmentType labelOffsetType) {
+		String label = marker.getLabel();
+		RectangleAnchor anchor = marker.getLabelAnchor();
+		if (label != null) {
+		    Font labelFont = marker.getLabelFont();
+		    g2.setFont(labelFont);
+		    g2.setPaint(marker.getLabelPaint());
+			RectangleInsets markerOffset = marker.getLabelOffset();
+			Rectangle2D anchorRect = null;
+			if (orientation == PlotOrientation.HORIZONTAL) {
+			    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
+			            labelOffsetType, LengthAdjustmentType.CONTRACT);
+			}
+			else if (orientation == PlotOrientation.VERTICAL) {
+			    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
+			            LengthAdjustmentType.CONTRACT, labelOffsetType);
+			}
+		    Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
+		    TextUtilities.drawAlignedString(label, g2,
+		            (float) coordinates.getX(), (float) coordinates.getY(),
+		            marker.getLabelTextAnchor());
+		}
 	}
 
 }
