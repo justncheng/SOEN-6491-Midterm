@@ -4204,27 +4204,14 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	
 	        // now draw the outlines, if visible...
 	        if (im.getOutlinePaint() != null && im.getOutlineStroke() != null) {
-	            if (orientation == PlotOrientation.VERTICAL) {
-	                g2.setPaint(im.getOutlinePaint());
-	                g2.setStroke(im.getOutlineStroke());
-	                if (range.contains(start)) {
-	                    g2.draw(createMarkerLine(orientation, start2d, dataArea));
-	                }
-	                if (range.contains(end)) {
-	                    g2.draw(createMarkerLine(orientation, end2d, dataArea));
-	                }
-	            }
-	            else if (orientation == PlotOrientation.HORIZONTAL) {
-	                
-	                g2.setPaint(im.getOutlinePaint());
-	                g2.setStroke(im.getOutlineStroke());
-	                if (range.contains(start)) {
-	                    g2.draw(createMarkerLine(orientation, start2d, dataArea));
-	                }
-	                if (range.contains(end)) {
-	                    g2.draw(createMarkerLine(orientation, end2d, dataArea));
-	                }
-	            }
+                g2.setPaint(im.getOutlinePaint());
+                g2.setStroke(im.getOutlineStroke());
+                if (range.contains(start)) {
+                    g2.draw(createMarkerLine(orientation, start2d, dataArea));
+                }
+                if (range.contains(end)) {
+                    g2.draw(createMarkerLine(orientation, end2d, dataArea));
+                }
 	        }
 	        
 	        drawMarkerLabel(g2, orientation, marker, rect, marker.getLabelOffsetType());
