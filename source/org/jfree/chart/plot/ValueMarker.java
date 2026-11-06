@@ -45,10 +45,19 @@
 
 package org.jfree.chart.plot;
 
+import java.awt.AlphaComposite;
+import java.awt.Composite;
+import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.event.MarkerChangeEvent;
+import org.jfree.data.Range;
+import org.jfree.ui.LengthAdjustmentType;
+import org.jfree.ui.RectangleEdge;
 
 /**
  * A marker that represents a single value.  Markers can be added to plots to
@@ -154,4 +163,37 @@ public class ValueMarker extends Marker {
         }
         return true;
     }
+    
+    /**
+     * 
+     * @param g2
+     * @param orientation
+     * @param edge
+     * @param axis
+     * @param dataArea
+     */
+    @Override
+    public void draw(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, 
+    		Rectangle2D dataArea) {
+    	
+		double value = getValue();
+		Range range = axis.getRange();
+		if (!range.contains(value)) {
+		    return;
+		}
+
+		double v = axis.valueToJava2D(value, dataArea,
+		        edge);
+		Line2D line = createMarkerLine(orientation, v, dataArea);
+
+		final Composite originalComposite = g2.getComposite();
+		g2.setComposite(AlphaComposite.getInstance(
+		        AlphaComposite.SRC_OVER, getAlpha()));
+		g2.setPaint(getPaint());
+		g2.setStroke(getStroke());
+		g2.draw(line);
+		
+		drawMarkerLabel(g2, orientation, line.getBounds2D(), LengthAdjustmentType.EXPAND);
+		g2.setComposite(originalComposite);
+	}
 }
