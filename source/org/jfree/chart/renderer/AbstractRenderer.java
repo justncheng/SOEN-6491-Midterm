@@ -4131,7 +4131,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	protected void drawMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis, Marker marker, Rectangle2D dataArea) {
 		if (marker instanceof ValueMarker) {
 	        ValueMarker vm = (ValueMarker) marker;
-	        drawValueMarker(g2, orientation, edge, axis, vm, dataArea);
+	        vm.draw(g2, orientation, edge, axis, dataArea);
 	    }
 	    else if (marker instanceof IntervalMarker) {
 	        IntervalMarker im = (IntervalMarker) marker;
@@ -4164,29 +4164,6 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 		drawIntervalOutlines(g2, orientation, dataArea, im, range, start2d, end2d);
 		
 		im.drawMarkerLabel(g2, orientation, rect, im.getLabelOffsetType());
-		g2.setComposite(originalComposite);
-	}
-
-	private void drawValueMarker(Graphics2D g2, PlotOrientation orientation, RectangleEdge edge, ValueAxis axis,
-			ValueMarker vm, Rectangle2D dataArea) {
-		double value = vm.getValue();
-		Range range = axis.getRange();
-		if (!range.contains(value)) {
-		    return;
-		}
-
-		double v = axis.valueToJava2D(value, dataArea,
-		        edge);
-		Line2D line = vm.createMarkerLine(orientation, v, dataArea);
-
-		final Composite originalComposite = g2.getComposite();
-		g2.setComposite(AlphaComposite.getInstance(
-		        AlphaComposite.SRC_OVER, vm.getAlpha()));
-		g2.setPaint(vm.getPaint());
-		g2.setStroke(vm.getStroke());
-		g2.draw(line);
-		
-		vm.drawMarkerLabel(g2, orientation, line.getBounds2D(), LengthAdjustmentType.EXPAND);
 		g2.setComposite(originalComposite);
 	}
 
