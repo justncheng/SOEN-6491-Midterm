@@ -4158,27 +4158,7 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
         	
 			Rectangle2D markerArea = line.getBounds2D();
 			LengthAdjustmentType labelOffsetType = LengthAdjustmentType.EXPAND;
-	        String label = marker.getLabel();
-	        RectangleAnchor anchor = marker.getLabelAnchor();
-	        if (label != null) {
-	            Font labelFont = marker.getLabelFont();
-	            g2.setFont(labelFont);
-	            g2.setPaint(marker.getLabelPaint());
-				RectangleInsets markerOffset = marker.getLabelOffset();
-				Rectangle2D anchorRect = null;
-				if (orientation == PlotOrientation.HORIZONTAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-				            labelOffsetType, LengthAdjustmentType.CONTRACT);
-				}
-				else if (orientation == PlotOrientation.VERTICAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-				            LengthAdjustmentType.CONTRACT, labelOffsetType);
-				}
-	            Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
-	            TextUtilities.drawAlignedString(label, g2,
-	                    (float) coordinates.getX(), (float) coordinates.getY(),
-	                    marker.getLabelTextAnchor());
-	        }
+	        drawMarkerLabel(g2, orientation, marker, markerArea, labelOffsetType);
 	        g2.setComposite(originalComposite);
 	    }
 	    else if (marker instanceof IntervalMarker) {
@@ -4268,29 +4248,34 @@ public abstract class AbstractRenderer implements Cloneable, Serializable {
 	        
 	        Rectangle2D markerArea = rect;
 			LengthAdjustmentType labelOffsetType = marker.getLabelOffsetType();
-	        String label = marker.getLabel();
-	        RectangleAnchor anchor = marker.getLabelAnchor();
-	        if (label != null) {
-	            Font labelFont = marker.getLabelFont();
-	            g2.setFont(labelFont);
-	            g2.setPaint(marker.getLabelPaint());
-				RectangleInsets markerOffset = marker.getLabelOffset();
-				Rectangle2D anchorRect = null;
-				if (orientation == PlotOrientation.HORIZONTAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-				            labelOffsetType, LengthAdjustmentType.CONTRACT);
-				}
-				else if (orientation == PlotOrientation.VERTICAL) {
-				    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-				            LengthAdjustmentType.CONTRACT, labelOffsetType);
-				}
-	            Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
-	            TextUtilities.drawAlignedString(label, g2,
-	                    (float) coordinates.getX(), (float) coordinates.getY(),
-	                    marker.getLabelTextAnchor());
-	        }
+	        drawMarkerLabel(g2, orientation, marker, markerArea, labelOffsetType);
 	        g2.setComposite(originalComposite);
 	    }
+	}
+
+	private void drawMarkerLabel(Graphics2D g2, PlotOrientation orientation, Marker marker, Rectangle2D markerArea,
+			LengthAdjustmentType labelOffsetType) {
+		String label = marker.getLabel();
+		RectangleAnchor anchor = marker.getLabelAnchor();
+		if (label != null) {
+		    Font labelFont = marker.getLabelFont();
+		    g2.setFont(labelFont);
+		    g2.setPaint(marker.getLabelPaint());
+			RectangleInsets markerOffset = marker.getLabelOffset();
+			Rectangle2D anchorRect = null;
+			if (orientation == PlotOrientation.HORIZONTAL) {
+			    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
+			            labelOffsetType, LengthAdjustmentType.CONTRACT);
+			}
+			else if (orientation == PlotOrientation.VERTICAL) {
+			    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
+			            LengthAdjustmentType.CONTRACT, labelOffsetType);
+			}
+		    Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
+		    TextUtilities.drawAlignedString(label, g2,
+		            (float) coordinates.getX(), (float) coordinates.getY(),
+		            marker.getLabelTextAnchor());
+		}
 	}
 
 }
