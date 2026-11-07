@@ -43,6 +43,8 @@
 
 package org.jfree.chart.plot;
 
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
@@ -164,5 +166,18 @@ public final class PlotOrientation implements Serializable {
     public PlotOrientation getOpposite() {
     	return this == HORIZONTAL ? VERTICAL : HORIZONTAL;
     }
+    
+	protected Line2D createLine(PlotOrientation orientation, double position, Rectangle2D dataArea) {
+		Line2D line = null;
+		if (orientation == PlotOrientation.HORIZONTAL) {
+		    line = new Line2D.Double(position, dataArea.getMinY(), position,
+		            dataArea.getMaxY());
+		}
+		else if (orientation == PlotOrientation.VERTICAL) {
+		    line = new Line2D.Double(dataArea.getMinX(), position,
+		            dataArea.getMaxX(), position);
+		}
+		return line;
+	}
 
 }
