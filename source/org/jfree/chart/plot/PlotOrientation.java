@@ -179,5 +179,25 @@ public final class PlotOrientation implements Serializable {
 		}
 		return line;
 	}
+	
+	public Rectangle2D createRectangle(Rectangle2D area, double start2d, double end2d) {
+        double low = Math.min(start2d, end2d);
+        double high = Math.max(start2d, end2d);
+
+        Rectangle2D rect = null;
+        if (this == PlotOrientation.HORIZONTAL) {
+            // clip left and right bounds to data area
+            low = Math.max(low, area.getMinX());
+            high = Math.min(high, area.getMaxX());
+            rect = new Rectangle2D.Double(low,
+                    area.getMinY(), high - low,
+                    area.getHeight());
+        }
+        // clip top and bottom bounds to data area
+        low = Math.max(low, area.getMinY());
+        high = Math.min(high, area.getMaxY());
+        return new Rectangle2D.Double(area.getMinX(),low, area.getWidth(),
+        		high - low);
+    }
 
 }

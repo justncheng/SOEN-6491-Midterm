@@ -45,10 +45,8 @@
 
 package org.jfree.chart.plot;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -251,7 +249,7 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
             RectangleEdge edge, ValueAxis axis, Rectangle2D dataArea) {
         double start2d = axis.valueToJava2D(getStartValue(), dataArea, edge);
         double end2d = axis.valueToJava2D(getEndValue(), dataArea, edge);
-        return createMarkerRectangle(orientation, dataArea, start2d, end2d);
+        return orientation.createRectangle(dataArea, start2d, end2d);
     }
 
     @Override
@@ -293,31 +291,6 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
         else {
             g2.setPaint(p);
         }
-    }
-
-    private Rectangle2D createMarkerRectangle(PlotOrientation orientation,
-            Rectangle2D dataArea, double start2d, double end2d) {
-        double low = Math.min(start2d, end2d);
-        double high = Math.max(start2d, end2d);
-
-        Rectangle2D rect = null;
-        if (orientation == PlotOrientation.HORIZONTAL) {
-            // clip left and right bounds to data area
-            low = Math.max(low, dataArea.getMinX());
-            high = Math.min(high, dataArea.getMaxX());
-            rect = new Rectangle2D.Double(low,
-                    dataArea.getMinY(), high - low,
-                    dataArea.getHeight());
-        }
-        else if (orientation == PlotOrientation.VERTICAL) {
-            // clip top and bottom bounds to data area
-            low = Math.max(low, dataArea.getMinY());
-            high = Math.min(high, dataArea.getMaxY());
-            rect = new Rectangle2D.Double(dataArea.getMinX(),
-                    low, dataArea.getWidth(),
-                    high - low);
-        }
-        return rect;
     }
 
 }
