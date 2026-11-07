@@ -48,6 +48,9 @@ import java.awt.geom.Rectangle2D;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
+import org.jfree.ui.LengthAdjustmentType;
+import org.jfree.ui.RectangleInsets;
+
 /**
  * Used to indicate the orientation (horizontal or vertical) of a 2D plot.
  * It is the direction of the y-axis that is the determinant (a conventional
@@ -167,31 +170,24 @@ public final class PlotOrientation implements Serializable {
     	return this == HORIZONTAL ? VERTICAL : HORIZONTAL;
     }
     
-	protected Line2D createLine(PlotOrientation orientation, double position, Rectangle2D dataArea) {
-		Line2D line = null;
-		if (orientation == PlotOrientation.HORIZONTAL) {
-		    line = new Line2D.Double(position, dataArea.getMinY(), position,
-		            dataArea.getMaxY());
+	protected Line2D createLine(double position, Rectangle2D area) {
+		if (this == HORIZONTAL) {
+		    return new Line2D.Double(position, area.getMinY(), position,
+		            area.getMaxY());
 		}
-		else if (orientation == PlotOrientation.VERTICAL) {
-		    line = new Line2D.Double(dataArea.getMinX(), position,
-		            dataArea.getMaxX(), position);
-		}
-		return line;
+	    return new Line2D.Double(area.getMinX(), position,
+	    		area.getMaxX(), position);
 	}
 	
 	public Rectangle2D createRectangle(Rectangle2D area, double start2d, double end2d) {
         double low = Math.min(start2d, end2d);
         double high = Math.max(start2d, end2d);
-
-        Rectangle2D rect = null;
         if (this == PlotOrientation.HORIZONTAL) {
             // clip left and right bounds to data area
             low = Math.max(low, area.getMinX());
             high = Math.min(high, area.getMaxX());
-            rect = new Rectangle2D.Double(low,
-                    area.getMinY(), high - low,
-                    area.getHeight());
+            return new Rectangle2D.Double(low, area.getMinY(), high - low,
+            		area.getHeight());
         }
         // clip top and bottom bounds to data area
         low = Math.max(low, area.getMinY());
@@ -199,5 +195,15 @@ public final class PlotOrientation implements Serializable {
         return new Rectangle2D.Double(area.getMinX(),low, area.getWidth(),
         		high - low);
     }
+	
+	public Rectangle2D createLabelAnchorArea(RectangleInsets offset, Rectangle2D area, 
+			LengthAdjustmentType labelOffsetType) {
+		if (this == HORIZONTAL) {
+		    return offset.createAdjustedRectangle(area, labelOffsetType, 
+		    		LengthAdjustmentType.CONTRACT);
+		}
+		    return offset.createAdjustedRectangle(area, LengthAdjustmentType.CONTRACT, 
+		    		labelOffsetType);
+	}
 
 }

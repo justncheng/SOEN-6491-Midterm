@@ -747,15 +747,8 @@ public abstract class Marker implements Cloneable, Serializable {
 		    g2.setFont(labelFont);
 		    g2.setPaint(getLabelPaint());
 			RectangleInsets markerOffset = getLabelOffset();
-			Rectangle2D anchorRect = null;
-			if (orientation == PlotOrientation.HORIZONTAL) {
-			    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-			            labelOffsetType, LengthAdjustmentType.CONTRACT);
-			}
-			else if (orientation == PlotOrientation.VERTICAL) {
-			    anchorRect = markerOffset.createAdjustedRectangle(markerArea,
-			            LengthAdjustmentType.CONTRACT, labelOffsetType);
-			}
+			Rectangle2D anchorRect = orientation.createLabelAnchorArea(markerOffset, 
+					markerArea, labelOffsetType);
 		    Point2D coordinates = RectangleAnchor.coordinates(anchorRect, anchor);
 		    TextUtilities.drawAlignedString(label, g2,
 		            (float) coordinates.getX(), (float) coordinates.getY(),

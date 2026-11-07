@@ -270,10 +270,10 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
             g2.setPaint(getOutlinePaint());
             g2.setStroke(getOutlineStroke());
             if (range.contains(getStartValue())) {
-                g2.draw(orientation.createLine(orientation, start2d, dataArea));
+                g2.draw(orientation.createLine(start2d, dataArea));
             }
             if (range.contains(getEndValue())) {
-                g2.draw(orientation.createLine(orientation, end2d, dataArea));
+                g2.draw(orientation.createLine(end2d, dataArea));
             }
         }
     }

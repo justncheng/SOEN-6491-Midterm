@@ -173,7 +173,7 @@ public class ValueMarker extends Marker {
     protected Shape createMarkerShape(PlotOrientation orientation,
             RectangleEdge edge, ValueAxis axis, Rectangle2D dataArea) {
         double v = axis.valueToJava2D(getValue(), dataArea, edge);
-        return orientation.createLine(orientation, v, dataArea);
+        return orientation.createLine(v, dataArea);
     }
 
     @Override
