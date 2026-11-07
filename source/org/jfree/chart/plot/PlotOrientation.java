@@ -43,8 +43,13 @@
 
 package org.jfree.chart.plot;
 
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+
+import org.jfree.ui.LengthAdjustmentType;
+import org.jfree.ui.RectangleInsets;
 
 /**
  * Used to indicate the orientation (horizontal or vertical) of a 2D plot.
@@ -164,5 +169,41 @@ public final class PlotOrientation implements Serializable {
     public PlotOrientation getOpposite() {
     	return this == HORIZONTAL ? VERTICAL : HORIZONTAL;
     }
+    
+	protected Line2D createLine(double position, Rectangle2D area) {
+		if (this == HORIZONTAL) {
+		    return new Line2D.Double(position, area.getMinY(), position,
+		            area.getMaxY());
+		}
+	    return new Line2D.Double(area.getMinX(), position,
+	    		area.getMaxX(), position);
+	}
+	
+	public Rectangle2D createRectangle(Rectangle2D area, double start2d, double end2d) {
+        double low = Math.min(start2d, end2d);
+        double high = Math.max(start2d, end2d);
+        if (this == PlotOrientation.HORIZONTAL) {
+            // clip left and right bounds to data area
+            low = Math.max(low, area.getMinX());
+            high = Math.min(high, area.getMaxX());
+            return new Rectangle2D.Double(low, area.getMinY(), high - low,
+            		area.getHeight());
+        }
+        // clip top and bottom bounds to data area
+        low = Math.max(low, area.getMinY());
+        high = Math.min(high, area.getMaxY());
+        return new Rectangle2D.Double(area.getMinX(),low, area.getWidth(),
+        		high - low);
+    }
+	
+	public Rectangle2D createLabelAnchorArea(RectangleInsets offset, Rectangle2D area, 
+			LengthAdjustmentType labelOffsetType) {
+		if (this == HORIZONTAL) {
+		    return offset.createAdjustedRectangle(area, labelOffsetType, 
+		    		LengthAdjustmentType.CONTRACT);
+		}
+		    return offset.createAdjustedRectangle(area, LengthAdjustmentType.CONTRACT, 
+		    		labelOffsetType);
+	}
 
 }
